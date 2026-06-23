@@ -42,14 +42,22 @@ def create_app() -> Flask:
 
     # 注册业务蓝图
     app.register_blueprint(model_bp)
-    # 注册全局异常处理
-    register_error_handlers(app)
+    # 注册钩子函数
+    register_handlers(app)
 
     return app
 
 
-def register_error_handlers(app: Flask):
+def register_handlers(app: Flask):
     """全局错误拦截"""
+
+    @app.after_request
+    def add_cors_headers(response):
+        # 动态修改 HTTP 头，解决跨域问题
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        return response
 
     @app.errorhandler(Exception)
     def handle_exception(e):
