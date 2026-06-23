@@ -1,0 +1,61 @@
+"""
+Flask 应用工厂与核心生命周期管理模块
+
+本模块负责整个 Flask 应用程序的初始化、配置加载、第三方扩展组件绑定以及业务蓝图的动态注册。
+采用工厂模式（Application Factory Pattern）设计，以支持多环境隔离部署并有效规避循环导入问题。
+
+主要职责包括:
+1. 环境配置分发: 依据环境变量 `FLASK_ENV` 动态加载 `app.config` 映射类。
+2. 扩展组件装配: 初始化并注入数据库 (SQLAlchemy)、缓存 (Redis) 等基础中间件。
+3. 路由蓝图注册: 统一挂载各版本 API 业务流（如预测推理模块）。
+4. 全局拦截兜底: 注册全局异常捕获器 (Error Handlers)，确保所有错误输出标准化为 JSON 响应。
+
+使用示例:
+    >>> from app import create_app
+    >>>
+    >>> app = create_app()
+
+Author: 骆昊
+Version: 0.0.1
+"""
+# import os
+
+from flask import Flask, jsonify
+from werkzeug.exceptions import HTTPException
+
+# from app.config import config_map
+from app.v1.predict import model_bp
+
+
+def create_app() -> Flask:
+    """应用工厂函数"""
+    app = Flask(__name__)
+
+    # 动态加载环境配置
+    # env = os.getenv('FLASK_ENV', 'production')
+    # app.config.from_object(config_map[env]())
+    # print(app.config)
+
+    # 将组件动态绑定到当前 app
+    # db.init_app(app)
+    # redis_client.init_app(app)
+
+    # 注册业务蓝图
+    app.register_blueprint(model_bp)
+    # 注册全局异常处理
+    register_error_handlers(app)
+
+    return app
+
+
+def register_error_handlers(app: Flask):
+    """全局错误拦截"""
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        # 拦截标准 HTTP 错误（如：4xx 错误）
+        if isinstance(e, HTTPException):
+            return jsonify({'code': e.code, 'message': e.description}), e.code
+
+        # 拦截业务层未捕获的异常
+        return jsonify({'code': 500, 'message': '服务器维护中请稍后尝试'}), 500
