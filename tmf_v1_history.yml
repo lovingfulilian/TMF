@@ -1,0 +1,11 @@
+name: tmf_v1
+channels:
+  - conda-forge
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - flask
+  - jieba
+  - pandas
+  - python=3.12
+  - scikit-learn
