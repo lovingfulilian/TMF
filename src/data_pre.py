@@ -1,6 +1,65 @@
 """
 data_pre - 数据预处理
 
+顺序：① 正则表达式剔除无效字符 - ② 中文分词 - ③ 去掉停用词
+
 Author: 骆昊
 Version: 0.0.1
 """
+import logging
+import re
+
+import jieba
+import pandas as pd
+
+from src.config import Config
+
+jieba.setLogLevel(logging.ERROR)
+
+SPACE_PATTERN = re.compile(r'[\s\u3000]+')
+BRACE_PATTERN = re.compile(r'\[.*?\]|\(.*?\)|【.*?】|（.*?）|「.*?」')
+ATUSR_PATTERN = re.compile(r'@\w+')
+TOPIC_PATTERN = re.compile(r'#.*?#')
+MYURL_PATTERN = re.compile(r'https?://[^\s\u4e00-\u9fa5]+')
+CHENN_PATTERN = re.compile(r'[^a-zA-Z0-9\s\u4e00-\u9fa5:,.?!;：，。？！；]+')
+NOENN_PATTERN = re.compile(r'[^\s\u4e00-\u9fa5：，。？！；]+')
+
+with open(Config.stopwords_file, encoding='utf-8') as file_object:
+    STOP_WORDS = set(file_object.read().splitlines())
+
+
+def clean_raw_text(text: str, allow_eng_num: bool=True) -> str:
+    """清理原始文本内容"""
+    text = re.sub(SPACE_PATTERN, ' ', text)
+    text = re.sub(BRACE_PATTERN, '', text)
+    text = re.sub(ATUSR_PATTERN, '', text)
+    text = re.sub(TOPIC_PATTERN, '', text)
+    text = re.sub(MYURL_PATTERN, '', text)
+
+    if allow_eng_num:
+        text = re.sub(CHENN_PATTERN, '', text)
+    else:
+        text = re.sub(NOENN_PATTERN, '', text)
+
+    text = re.sub(SPACE_PATTERN, ' ', text)
+    return text.strip()
+
+
+def cut_zh_words(text: str) -> str:
+    """中文句子的清理和分词"""
+    text = clean_raw_text(text)
+    words = jieba.lcut(text)
+    results = [word for word in words
+               if word.strip() and word not in STOP_WORDS]
+
+    return ' '.join(results)
+
+
+def main():
+    df = pd.read_csv(Config.train_raw_file, sep='\t', names=['text', 'label'])
+    df['text'] = df.text.map(cut_zh_words)
+    df.to_csv(Config.train_pre_file, index=False)
+
+
+if __name__ == '__main__':
+    main()

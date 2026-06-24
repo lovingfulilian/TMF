@@ -5,7 +5,6 @@ Author: 骆昊
 Version: 0.0.1
 """
 from app import create_app
-from src.config import Config
 
 app = create_app()
 
