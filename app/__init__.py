@@ -20,7 +20,7 @@ Version: 0.0.1
 """
 # import os
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from werkzeug.exceptions import HTTPException
 
 # from app.config import config_map
@@ -42,6 +42,7 @@ def create_app() -> Flask:
 
     # 注册业务蓝图
     app.register_blueprint(model_bp)
+
     # 注册钩子函数
     register_handlers(app)
 
@@ -49,14 +50,23 @@ def create_app() -> Flask:
 
 
 def register_handlers(app: Flask):
-    """全局错误拦截"""
+    """注册拦截钩子函数"""
+
+    # @app.before_request
+    # def check_auth():
+    #     white_list = []
+    #
+    #     if request.endpoint not in white_list:
+    #         token = request.headers.get('Authorization')
+    #         if not token:
+    #             return jsonify({'code': 401, 'msg': '请提供身份认证信息'}), 401
 
     @app.after_request
     def add_cors_headers(response):
         # 动态修改 HTTP 头，解决跨域问题
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         return response
 
     @app.errorhandler(Exception)
