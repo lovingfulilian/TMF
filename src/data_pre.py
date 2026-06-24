@@ -52,13 +52,19 @@ def cut_zh_words(text: str) -> str:
     results = [word for word in words
                if word.strip() and word not in STOP_WORDS]
 
-    return ' '.join(results)
+    if len(results) > 1:
+        return ' '.join(results)
+    return ''
 
 
 def main():
+    """程序入口"""
     df = pd.read_csv(Config.train_raw_file, sep='\t', names=['text', 'label'])
     df['text'] = df.text.map(cut_zh_words)
-    df.to_csv(Config.train_pre_file, index=False)
+    df.query('text != ""').to_csv(Config.train_pre_file, index=False)
+    df = pd.read_csv(Config.valid_raw_file, sep='\t', names=['text', 'label'])
+    df['text'] = df.text.map(cut_zh_words)
+    df.query('text != ""').to_csv(Config.valid_pre_file, index=False)
 
 
 if __name__ == '__main__':
