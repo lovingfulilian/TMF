@@ -5,7 +5,7 @@
 ### 克隆项目
 
 ```bash
-git clone --depth=1 https://gitee.com/jackfrued/tmf_v1.git
+git clone https://gitee.com/jackfrued/tmf_v1.git
 ```
 
 ### 还原环境
