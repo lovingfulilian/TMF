@@ -19,11 +19,11 @@ def train_model():
     """模型训练"""
     # 加载数据
     df = pd.read_csv(Config.train_pre_file)
-    X_train, y_train = df.text, df.label
+    X_train, y_train = df.text.values, df.label.values
     df = pd.read_csv(Config.valid_pre_file)
-    X_valid, y_valid = df.text, df.label
+    X_valid, y_valid = df.text.values, df.label.values
 
-    # 随机森林模型参数
+    # 随机森林模型参数（控制预剪枝）
     rf_params = {
         'n_estimators': 128,
         'min_samples_split': 16,
@@ -33,8 +33,11 @@ def train_model():
 
     # 构造流水线
     pl = Pipeline(steps=[
+        # TfidfVectorizer ---> 将分词后的中文文本处理成稀疏向量（矩阵）- SparseMatrix
         ('vec', TfidfVectorizer(ngram_range=(1, 2), min_df=0.0001, max_df=0.99)),
+        # SelectKBest ---> 特征选择 ---> 方差分析（最大化组间方差最小化组内方差）
         ('sel', SelectKBest(k=8192)),
+        # RandomForestClassifier ---> 集成学习（Bagging）
         ('clf', RandomForestClassifier(**rf_params)),
     ])
     # 喂入数据
@@ -42,7 +45,7 @@ def train_model():
     # 验证效果
     y_pred = pl.predict(X_valid)
 
-    # 模型评估
+    # 模型评估 ---> 分类模型 ---> Accuracy / Precision / Recall / F1 Score / AUC
     print(confusion_matrix(y_valid, y_pred))
     print(classification_report(y_valid, y_pred))
 
