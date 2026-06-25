@@ -25,7 +25,7 @@ def test_base_url():
 def test_predict_valid():
     """测试 /predict 接口"""
     resp = requests.post(
-        url=BASE_URL + '/api/predict',
+        url=BASE_URL + '/api/v1/predict',
         headers={
             'Content-Type': 'application/json',
         },
@@ -43,7 +43,7 @@ def test_predict_valid():
 def test_predict_invalid():
     """测试 /predict 接口"""
     resp = requests.post(
-        url=BASE_URL + '/api/predict',
+        url=BASE_URL + '/api/v1/predict',
         headers={
             'Content-Type': 'application/json',
         },

@@ -22,3 +22,9 @@ Pip:
 pip install -r requirements.txt
 ```
 
+### 测试用例
+
+```bash
+pytest tests/ -v
+pytest tests/ -v -m api
+```

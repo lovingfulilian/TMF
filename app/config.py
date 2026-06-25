@@ -14,10 +14,8 @@ class BaseConfig:
     """基础配置类（所有环境共享的公共配置）"""
 
     # 核心安全密匙（生产环境必须在 .env 中覆盖它）
-    SECRET_KEY = os.getenv('SECRET_KEY', "fallback-secret-key-for-dev")
-
-    # 数据库通用配置
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # 可以通过 openssl rand -hex 32
+    SECRET_KEY = os.getenv('SECRET_KEY', '82ccc7debfad504e2e026c0c14e8721e17f9c4d884bfb94e32247a0cc3abf5e2')
 
     # 模型持久化文件路径
     MODEL_PATH = BASE_DIR / 'models' / 'text-clf-model.pkl'
@@ -32,6 +30,12 @@ class DevelopmentConfig(BaseConfig):
         'DATABASE_URL',
         f'sqlite:///{BASE_DIR / "app_dev.db"}'
     )
+
+
+class TestingConfig(BaseConfig):
+    """测试环境配置"""
+    pass
+
 
 
 class ProductionConfig(BaseConfig):
@@ -53,5 +57,5 @@ class ProductionConfig(BaseConfig):
 config_map = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
-    'test': BaseConfig  # 可按需扩展单元测试配置
+    'testing': TestingConfig
 }
