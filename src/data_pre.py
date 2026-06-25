@@ -16,6 +16,7 @@ from src.config import Config
 
 jieba.setLogLevel(logging.ERROR)
 
+# 清洗文本的正则表达式
 SPACE_PATTERN = re.compile(r'[\s\u3000]+')
 BRACE_PATTERN = re.compile(r'\[.*?\]|\(.*?\)|【.*?】|（.*?）|「.*?」')
 ATUSR_PATTERN = re.compile(r'@\w+')
@@ -24,6 +25,7 @@ MYURL_PATTERN = re.compile(r'https?://[^\s\u4e00-\u9fa5]+')
 CHENN_PATTERN = re.compile(r'[^a-zA-Z0-9\s\u4e00-\u9fa5:,.?!;：，。？！；]+')
 NOENN_PATTERN = re.compile(r'[^\s\u4e00-\u9fa5：，。？！；]+')
 
+# 加载停用词表
 with open(Config.stopwords_file, encoding='utf-8') as file_object:
     STOP_WORDS = set(file_object.read().splitlines())
 
@@ -54,17 +56,21 @@ def cut_zh_words(text: str) -> str:
 
     if len(results) > 1:
         return ' '.join(results)
+
     return ''
 
 
 def main():
     """程序入口"""
-    df = pd.read_csv(Config.train_raw_file, sep='\t', names=['text', 'label'])
+    # df = pd.read_csv(Config.train_raw_file, sep='\t', names=['text', 'label'])
+    # df['text'] = df.text.map(cut_zh_words)
+    # df.query('text != ""').to_csv(Config.train_pre_file, index=False)
+    # df = pd.read_csv(Config.valid_raw_file, sep='\t', names=['text', 'label'])
+    # df['text'] = df.text.map(cut_zh_words)
+    # df.query('text != ""').to_csv(Config.valid_pre_file, index=False)
+    df = pd.read_csv(Config.test_raw_file, sep='\t', names=['text', 'label'])
     df['text'] = df.text.map(cut_zh_words)
-    df.query('text != ""').to_csv(Config.train_pre_file, index=False)
-    df = pd.read_csv(Config.valid_raw_file, sep='\t', names=['text', 'label'])
-    df['text'] = df.text.map(cut_zh_words)
-    df.query('text != ""').to_csv(Config.valid_pre_file, index=False)
+    df.query('text != ""').to_csv(Config.test_pre_file, index=False)
 
 
 if __name__ == '__main__':

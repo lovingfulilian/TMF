@@ -18,13 +18,14 @@ Flask 应用工厂与核心生命周期管理模块
 Author: 骆昊
 Version: 0.0.1
 """
-# import os
+import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
 
-# from app.config import config_map
+from app.config import config_map
 from app.v1.predict import model_bp
+from app.extensions import thy_extension
 
 
 def create_app() -> Flask:
@@ -32,13 +33,14 @@ def create_app() -> Flask:
     app = Flask(__name__)
 
     # 动态加载环境配置
-    # env = os.getenv('FLASK_ENV', 'production')
-    # app.config.from_object(config_map[env]())
+    env = os.getenv('FLASK_ENV', 'production')
+    app.config.from_object(config_map[env]())
     # print(app.config)
 
     # 将组件动态绑定到当前 app
     # db.init_app(app)
     # redis_client.init_app(app)
+    thy_extension.init_app(app.config['MODEL_PATH'])
 
     # 注册业务蓝图
     app.register_blueprint(model_bp)
