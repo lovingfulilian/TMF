@@ -1,10 +1,20 @@
 name: tmf_v1
 channels:
-  - conda-forge
-  - defaults
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2/
 dependencies:
   - flask
   - jieba
   - pandas
   - python=3.12
   - scikit-learn
+  - matplotlib
+  - skl2onnx
+  - onnxruntime
+  - requests
+  - pytest
+  - streamlit
+  - loguru
+prefix: /opt/miniconda3/envs/tmf_v1
