@@ -11,10 +11,10 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 
-from config import Config
+from src.config import Config
 
 
-def main():
+def evaluate_model():
     df = pd.read_csv(Config.test_pre_file)
     pl = joblib.load(Config.pkl_model_file)  # type: Pipeline
 
@@ -31,7 +31,3 @@ def main():
 
     print(f'Accuracy: {total_accuracy / 100:.2%}')
     print(f'Duration: {total_duration / 100:.3f}')
-
-
-if __name__ == '__main__':
-    main()
