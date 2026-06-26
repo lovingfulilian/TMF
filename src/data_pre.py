@@ -64,10 +64,14 @@ def clean_data():
     """程序入口"""
     df = pd.read_csv(Config.train_raw_file, sep='\t', names=['text', 'label'])
     df['text'] = df.text.map(cut_zh_words)
-    df.query('text != ""').to_csv(Config.train_pre_file, index=False)
+    df = df.query('text != ""')
+    df['label'] = df.label.map(lambda x: f'__label__{x}')
+    df['result'] = df.label + ' ' + df.text
+    df['result'].to_csv(Config.train_pre_file, index=False, header=False)
+
     df = pd.read_csv(Config.valid_raw_file, sep='\t', names=['text', 'label'])
     df['text'] = df.text.map(cut_zh_words)
-    df.query('text != ""').to_csv(Config.valid_pre_file, index=False)
-    df = pd.read_csv(Config.test_raw_file, sep='\t', names=['text', 'label'])
-    df['text'] = df.text.map(cut_zh_words)
-    df.query('text != ""').to_csv(Config.test_pre_file, index=False)
+    df = df.query('text != ""')
+    df['label'] = df.label.map(lambda x: f'__label__{x}')
+    df['result'] = df.label + ' ' + df.text
+    df['result'].to_csv(Config.valid_pre_file, index=False, header=False)

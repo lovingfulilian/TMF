@@ -4,10 +4,14 @@ config - 训练模型相关配置类
 Author: 骆昊
 Version: 0.0.1
 """
+import os
 from pathlib import Path
 from dataclasses import dataclass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+if not os.path.exists(os.path.join(BASE_DIR, 'models')):
+    os.mkdir(os.path.join(BASE_DIR, 'models'))
 
 
 @dataclass(frozen=True)
@@ -26,3 +30,4 @@ class Config:
 
     pkl_model_file:  Path = BASE_DIR / 'models' / 'text-clf-model.pkl'
     onnx_model_file: Path = BASE_DIR / 'models' / 'text-clf-model.onnx'
+    ftz_model_file:  Path = BASE_DIR / 'models' / 'text-clf-model.ftz'
