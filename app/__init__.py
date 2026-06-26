@@ -19,13 +19,15 @@ Author: 骆昊
 Version: 0.0.1
 """
 import os
+import traceback
 
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
 
 from app.config import config_map
-from app.v1.predict import model_bp
 from app.extensions import thy_extension
+# from app.v1.predict import model_bp_v1
+from app.v2.predict import model_bp_v2
 
 
 def create_app() -> Flask:
@@ -33,7 +35,7 @@ def create_app() -> Flask:
     app = Flask(__name__)
 
     # 动态加载环境配置
-    env = os.getenv('FLASK_ENV', 'production')
+    env = os.getenv('FLASK_ENV', 'development')
     app.config.from_object(config_map[env]())
     # print(app.config)
 
@@ -43,7 +45,8 @@ def create_app() -> Flask:
     thy_extension.init_app(app.config['MODEL_PATH'])
 
     # 注册业务蓝图
-    app.register_blueprint(model_bp)
+    # app.register_blueprint(model_bp_v1)
+    app.register_blueprint(model_bp_v2)
 
     # 注册钩子函数
     register_handlers(app)
@@ -73,7 +76,8 @@ def register_handlers(app: Flask):
 
     @app.errorhandler(Exception)
     def handle_exception(e):
-        # 拦截标准 HTTP 错误（如：4xx 错误）
+        traceback.print_exc()
+        # 拦截标准 HTTP 错误
         if isinstance(e, HTTPException):
             return jsonify({'code': e.code, 'message': e.description}), e.code
 

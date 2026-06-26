@@ -1,12 +1,15 @@
 """
 tmf_app - Streamlit 用户界面
 
+日志级别：DEBUG < INFO < WARNING < ERROR < CRITICAL
+
 Author: 骆昊
 Version: 0.0.1
 """
 import sys
 from pathlib import Path
 
+import pandas as pd
 import requests
 import streamlit as st
 from loguru import logger
@@ -15,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_URL = "http://127.0.0.1:8080"
 
 logger.remove()
-logger.add(sys.stderr, level='INFO')
+logger.add(sys.stderr, level='WARNING')
 logger.add(
     BASE_DIR / 'logs/api_service.log',
     rotation='100 MB',   # 何时关闭当前日志文件并创建新文件
@@ -32,7 +35,7 @@ def get_class_label(text):
     """获取类别标签"""
     try:
         resp = requests.get(
-            url=f'{BASE_URL}/api/v1/predict',
+            url=f'{BASE_URL}/api/v2/predict',
             headers={'content-type': 'application/json'},
             json={'text': text},
         )
@@ -48,6 +51,17 @@ def get_class_label(text):
 st.write('## 投满分（文本分类专家）')
 content = st.text_input(label='请输入要分类的文本内容：')
 ok_button = st.button('确定')
+
+df = pd.DataFrame(
+    data={
+        'text': ['骆昊加入黑马程序员', '中国股市再次崩盘', '中国男足勇夺世界杯'],
+        'label': ['education', 'finance', 'sports'],
+        'confidence': [1.0, 0.99, 0.95]
+    },
+    columns=['text', 'label', 'confidence']
+)
+
+st.dataframe(df)
 
 if ok_button and content.strip():
     class_label = get_class_label(content)
