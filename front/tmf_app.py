@@ -9,7 +9,6 @@ Version: 0.0.1
 import sys
 from pathlib import Path
 
-import pandas as pd
 import requests
 import streamlit as st
 from loguru import logger
@@ -51,17 +50,6 @@ def get_class_label(text):
 st.write('## 投满分（文本分类专家）')
 content = st.text_input(label='请输入要分类的文本内容：')
 ok_button = st.button('确定')
-
-df = pd.DataFrame(
-    data={
-        'text': ['骆昊加入黑马程序员', '中国股市再次崩盘', '中国男足勇夺世界杯'],
-        'label': ['education', 'finance', 'sports'],
-        'confidence': [1.0, 0.99, 0.95]
-    },
-    columns=['text', 'label', 'confidence']
-)
-
-st.dataframe(df)
 
 if ok_button and content.strip():
     class_label = get_class_label(content)
