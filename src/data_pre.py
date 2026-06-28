@@ -1,20 +1,15 @@
 """
 data_pre - 数据预处理
 
-顺序：① 正则表达式剔除无效字符 - ② 中文分词 - ③ 去掉停用词
-
 Author: 骆昊
 Version: 0.0.1
 """
 import logging
 import re
 
-import jieba
 import pandas as pd
 
 from src.config import Config
-
-jieba.setLogLevel(logging.ERROR)
 
 # 清洗文本的正则表达式
 SPACE_PATTERN = re.compile(r'[\s\u3000]+')
@@ -47,31 +42,18 @@ def clean_raw_text(text: str, allow_eng_num: bool=True) -> str:
     return text.strip()
 
 
-def cut_zh_words(text: str) -> str:
-    """中文句子的清理和分词"""
-    text = clean_raw_text(text)
-    words = jieba.lcut(text)
-    results = [word for word in words
-               if word.strip() and word not in STOP_WORDS]
-
-    if len(results) > 1:
-        return ' '.join(results)
-
-    return ''
+def get_corpus(corpus_file):
+    """获取指定文件中的语料"""
+    corpus = []
+    with open(corpus_file, encoding='utf-8') as file_obj:
+        content = file_obj.read()
+    content = re.sub(r'\t+', '\t', content)
+    for line in content.splitlines():
+        doc, label = line.split('\t', maxsplit=1)
+        corpus.append((doc, int(label)))
+    return corpus
 
 
 def clean_data():
-    """程序入口"""
-    df = pd.read_csv(Config.train_raw_file, sep='\t', names=['text', 'label'])
-    df['text'] = df.text.map(cut_zh_words)
-    df = df.query('text != ""')
-    df['label'] = df.label.map(lambda x: f'__label__{x}')
-    df['result'] = df.label + ' ' + df.text
-    df['result'].to_csv(Config.train_pre_file, index=False, header=False)
-
-    df = pd.read_csv(Config.valid_raw_file, sep='\t', names=['text', 'label'])
-    df['text'] = df.text.map(cut_zh_words)
-    df = df.query('text != ""')
-    df['label'] = df.label.map(lambda x: f'__label__{x}')
-    df['result'] = df.label + ' ' + df.text
-    df['result'].to_csv(Config.valid_pre_file, index=False, header=False)
+    """清洗数据"""
+    pass

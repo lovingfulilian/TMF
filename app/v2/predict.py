@@ -20,11 +20,11 @@ def text_clf_predict():
     # Header ---> content-type: application/json
     # silent=True - 如果解析 JSON 失败不抛出异常
     # force=True - 强制将消息体解析为 JSON 格式
-    json_string = request.get_json(silent=True, force=True)
-    if not json_string:
+    json_obj = request.get_json(silent=True, force=True)
+    if not json_obj:
         return {'code': -20, 'message': '请求数据不符合 JSON 格式规范'}
 
-    text = json_string.get('text', '')
+    text = json_obj.get('text', '')
     if not text:
         return {'code': -10, 'message': '请提供要分类的文本内容'}
 

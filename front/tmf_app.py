@@ -34,7 +34,7 @@ def get_class_label(text):
     """获取类别标签"""
     try:
         resp = requests.get(
-            url=f'{BASE_URL}/api/v2/predict',
+            url=f'{BASE_URL}/api/v3/predict',
             headers={'content-type': 'application/json'},
             json={'text': text},
         )

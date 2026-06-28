@@ -27,7 +27,8 @@ from werkzeug.exceptions import HTTPException
 from app.config import config_map
 from app.extensions import thy_extension
 # from app.v1.predict import model_bp_v1
-from app.v2.predict import model_bp_v2
+# from app.v2.predict import model_bp_v2
+from app.v3.predict import model_bp_v3
 
 
 def create_app() -> Flask:
@@ -46,7 +47,8 @@ def create_app() -> Flask:
 
     # 注册业务蓝图
     # app.register_blueprint(model_bp_v1)
-    app.register_blueprint(model_bp_v2)
+    # app.register_blueprint(model_bp_v2)
+    app.register_blueprint(model_bp_v3)
 
     # 注册钩子函数
     register_handlers(app)
