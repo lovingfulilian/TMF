@@ -1,15 +1,14 @@
 name: tmf_v3
-channels:
-  - pytorch
-  - https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
 dependencies:
   - python=3.12
   - pytorch
+  - flask
   - modelscope
   - transformers
-  - scikit-learn
-  - flask
-  - pytest
+  - requests
   - streamlit
   - loguru
+  - scikit-learn
+  - pytest
+  - pip
 prefix: /opt/miniconda3/envs/tmf_v3
