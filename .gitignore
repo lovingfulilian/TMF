@@ -1,4 +1,7 @@
 models/
+models_quantized/
+models_distilled/
+models_pruned/
 
 # ==========================================
 # 1. Python 核心缓存与编译文件

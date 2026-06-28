@@ -4,31 +4,54 @@ model_eval - 模型评估
 Author: 骆昊
 Version: 0.0.1
 """
+import random
 import time
 
-import fasttext
-import joblib
 import numpy as np
-import pandas as pd
+import torch
 from sklearn.metrics import accuracy_score
-from sklearn.pipeline import Pipeline
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from src.config import Config
+from src.data_pre import get_corpus
 
 
 def evaluate_model():
-    df = pd.read_csv(Config.test_pre_file)
-    clf = fasttext.load_model(str(Config.ftz_model_file))
+    device = torch.device(
+        'cuda' if torch.cuda.is_available() else
+        'mps' if torch.backends.mps.is_available() else
+        'cpu'
+    )
 
-    total_accuracy = 0.0
-    total_duration = 0.0
+    tokenizer = AutoTokenizer.from_pretrained(Config.model_output_dir)
+    model = AutoModelForSequenceClassification.from_pretrained(Config.model_output_dir)
+    model.to(device)
+
+    model.eval()
+
+    valid_corpus = get_corpus(Config.valid_raw_file)
+    total_accuracy, total_duration = 0.0, 0.0
     for _ in range(100):
-        temp = df.sample(n=100)
-        X_test, y_test = temp.text.values, temp.label.values
+        samples = random.sample(valid_corpus, k=100)
+        texts, labels = zip(*samples)
+        y_test = np.array(labels)
+
+        inputs = tokenizer(
+            texts,
+            return_tensors='pt',
+            truncation=True,
+            padding='max_length',
+            max_length=32
+        )
+        input_ids = inputs['input_ids'].to(device)
+        attention_mask = inputs['attention_mask'].to(device)
+
         start = time.perf_counter()
-        labels, _ = clf.predict(X_test.tolist())
+        with torch.inference_mode():
+            output = model(input_ids=input_ids, attention_mask=attention_mask)
         end = time.perf_counter()
-        y_pred = [int(label[-1]) for label in np.ravel(labels)]
+
+        y_pred = torch.argmax(output.logits, dim=-1).cpu().numpy()
         total_accuracy += accuracy_score(y_test, y_pred)
         total_duration += end - start
 
