@@ -1,4 +1,8 @@
 name: tmf_v3
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
 dependencies:
   - python=3.12
   - pytorch

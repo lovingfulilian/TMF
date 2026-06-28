@@ -15,6 +15,7 @@ import torch.optim as optim
 from modelscope import AutoTokenizer, AutoModelForSequenceClassification
 from sklearn.metrics import classification_report, accuracy_score
 from torch.utils.data import DataLoader
+from transformers import BertTokenizer
 
 from src.config import Config
 from src.data_pre import get_corpus
