@@ -23,8 +23,8 @@ def evaluate_model():
         'cpu'
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(Config.model_output_dir)
-    model = AutoModelForSequenceClassification.from_pretrained(Config.model_output_dir)
+    tokenizer = AutoTokenizer.from_pretrained(Config.distilled_model_dir)
+    model = AutoModelForSequenceClassification.from_pretrained(Config.distilled_model_dir)
     model.to(device)
 
     model.eval()

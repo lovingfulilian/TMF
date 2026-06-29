@@ -53,6 +53,7 @@ def train_model():
     tokenizer = AutoTokenizer.from_pretrained(Config.pretrained_model)
 
     train_corpus = get_corpus(Config.train_raw_file)
+    random.seed(3)
     samples = random.sample(train_corpus, k=900)
 
     train_dataset = TMFDataset(samples, tokenizer, max_len=32)

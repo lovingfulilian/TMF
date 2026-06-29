@@ -25,7 +25,7 @@ MEGA_BASE = 1024 * 1024
 # macOS M - 将量化后端设置为 qnnpack 引擎（ARM 架构）
 # Quantized Neural Network PACKage
 torch.backends.quantized.engine = 'qnnpack'
-# Intel / AMD - 将量化后端设置为 fbgemm 引擎（Ax86 架构）
+# Intel / AMD - 将量化后端设置为 fbgemm 引擎（x86 架构）
 # Facebook GEneral Matrix Multiplication
 # torch.backends.quantized.engine = 'fbgemm'
 
@@ -119,12 +119,9 @@ def distill_model():
     )
 
     # 教师模型使用你之前在本地训练好的完美微调模型目录
-    teacher_dir = Config.model_output_dir
-    student_name = 'hfl/rbt3'
-
-    tokenizer = AutoTokenizer.from_pretrained(teacher_dir)
-    teacher_model = AutoModelForSequenceClassification.from_pretrained(teacher_dir)
-    student_model = AutoModelForSequenceClassification.from_pretrained(student_name, num_labels=10)
+    tokenizer = AutoTokenizer.from_pretrained(Config.model_output_dir)
+    teacher_model = AutoModelForSequenceClassification.from_pretrained(Config.model_output_dir)
+    student_model = AutoModelForSequenceClassification.from_pretrained('hfl/rbt3', num_labels=10)
 
     teacher_model.to(device)
     student_model.to(device)
@@ -133,6 +130,7 @@ def distill_model():
     student_model.train()
 
     train_corpus = get_corpus(Config.train_raw_file)
+    random.seed(3)
     samples = random.sample(train_corpus, k=900)
     train_dataset = TMFDataset(samples, tokenizer, max_len=32)
     train_loader = DataLoader(
@@ -148,7 +146,7 @@ def distill_model():
 
     EPOCHS = 16
     temperature = 4.0  # 软化概率分布的温度
-    alpha = 0.5        # 教师监督与真实标签的平衡权重
+    alpha = 0.7        # 教师监督与真实标签的平衡权重
 
     for epoch in range(1, EPOCHS + 1):
         total_loss = 0.0
@@ -176,7 +174,7 @@ def distill_model():
             loss_soft = F.kl_div(
                 F.log_softmax(student_logits / temperature, dim=-1),
                 F.softmax(teacher_logits / temperature, dim=-1),
-                reduction='mean'
+                reduction='batchmean'
             ) * (temperature ** 2)
 
             # 综合损失
@@ -227,7 +225,7 @@ def evaluate_distilled_model():
 
 
 def prune_bert_layers():
-    """结构化剪枝（切除 BERT 模型后半部 ransformer 层）"""
+    """结构化剪枝（切除 BERT 模型后半部 transformer 层）"""
     tokenizer = AutoTokenizer.from_pretrained(Config.model_output_dir)
     model = AutoModelForSequenceClassification.from_pretrained(Config.model_output_dir)
 
