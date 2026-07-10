@@ -27,5 +27,4 @@ pip install -r requirements.txt
 ```bash
 pytest tests/ -v
 pytest tests/ -v -m api
-
 ```
